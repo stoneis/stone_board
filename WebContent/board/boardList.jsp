@@ -1,5 +1,20 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<%
+	Connection conn = null;
+	Statement stmt = null;
+	ResultSet rs = null;
+	try {
+		conn = DriverManager.getConnection(
+			"jdbc:oracle:thin:@localhost:1521:xe", 
+			"stone", 
+			"1234"
+		);
+		stmt = conn.createStatement();
+		stmt.executeQuery("SELECT * FROM BOARD");
+		rs = stmt.getResultSet();
+
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,41 +56,27 @@
 <tr>
 	<td colspan="5" align="center">조회된 결과가 없습니다.</td>
 </tr>
+<%
+	while(rs.next()) {
+%>
 <tr>
-	<td align="center">1</td>
-	<td>제목 입니다.</td>
-	<td align="center">홍길동</td>
-	<td align="center">3</td>
-	<td align="center">2020-03-25</td>
+	<td align="center"><%=rs.getString("NO")%></td>
+	<td><%=rs.getString("SUBJECT")%></td>
+	<td align="center"><%=rs.getString("NAME")%></td>
+	<td align="center"><%=rs.getString("READ_CNT")%></td>
+	<td align="center"><%=rs.getString("REGIST_DT")%></td>
 </tr>
-<tr>
-	<td align="center">1</td>
-	<td>제목 입니다.</td>
-	<td align="center">홍길동</td>
-	<td align="center">3</td>
-	<td align="center">2020-03-25</td>
-</tr>
-<tr>
-	<td align="center">1</td>
-	<td>제목 입니다.</td>
-	<td align="center">홍길동</td>
-	<td align="center">3</td>
-	<td align="center">2020-03-25</td>
-</tr>
-<tr>
-	<td align="center">1</td>
-	<td>제목 입니다.</td>
-	<td align="center">홍길동</td>
-	<td align="center">3</td>
-	<td align="center">2020-03-25</td>
-</tr>
-<tr>
-	<td align="center">1</td>
-	<td>제목 입니다.</td>
-	<td align="center">홍길동</td>
-	<td align="center">3</td>
-	<td align="center">2020-03-25</td>
-</tr>
+<% } %>
 </table>
 </body>
 </html>
+<%
+
+	} catch (SQLException e) {
+		out.println(e.getMessage());
+	} finally {
+		if (rs != null) rs.close();
+		if (stmt != null) stmt.close();
+		if (conn != null) conn.close();
+	}
+%>
