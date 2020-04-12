@@ -3,16 +3,44 @@
 <%
 	Connection conn = null;
 	Statement stmt = null;
-	ResultSet rs = null;
+	ResultSet totalRs = null;
+	ResultSet listRs = null;
 	try {
+		
+		String searchField = request.getParameter("searchField");
+		String searchText = request.getParameter("searchText");
+		searchField = searchField == null ? "" : searchField;
+		searchText = searchText == null ? "" : searchText;
+		
+		System.out.println("PARAMETER SEARCHFIELD : " + searchField);
+		System.out.println("PARAMETER SEARCHTEXT : " + searchText);
+
 		conn = DriverManager.getConnection(
 			"jdbc:oracle:thin:@localhost:1521:xe", 
 			"stone", 
 			"1234"
 		);
+		
+		String whereSql = "";
+		if (!"".equals(searchField)) {
+			whereSql += " WHERE " + searchField + " LIKE '%" + searchText + "%'";
+		} else if ("".equals(searchField) && !"".equals(searchText)) {
+			whereSql += " WHERE SUBJECT LIKE '%" + searchText + "%' OR CONTENTS LIKE '%" + searchText + "%'";
+		}
+		String totalSql = "SELECT COUNT(*) AS TOTAL FROM BOARD" + whereSql;
+		
 		stmt = conn.createStatement();
-		stmt.executeQuery("SELECT * FROM BOARD");
-		rs = stmt.getResultSet();
+		stmt.executeQuery(totalSql);
+		System.out.println("COUNT SQL : " + totalSql);
+		totalRs = stmt.getResultSet();
+		totalRs.next();
+		int total = totalRs.getInt("TOTAL");
+		
+		String listSql = "SELECT * FROM BOARD" + whereSql;
+		listSql += " ORDER BY REGIST_DT DESC";
+		stmt.executeQuery(listSql);
+		System.out.println("LIST SQL : " + listSql);
+		listRs = stmt.getResultSet();
 
 %>
 <!DOCTYPE html>
@@ -26,56 +54,64 @@
 	</style>
 </head>
 <body>
-<h1>게시판 목록</h1>
+<h1>게시판 목록 (blog.naver.com/musasin84)</h1>
+<form name="searchForm" action="boardList.jsp" method="get">
 <table style="border: solid 1px; width: 500px; margin-bottom: 5px;">
 <tr>
 	<td>
-		<select style="width: 98%">
-			<option>전체</option>
-			<option>제목</option>
-			<option>내용</option>
+		<select name="searchField" style="width: 98%">
+			<option value="" <%if ("".equals(searchField)) { out.print("selected=\"selected\"");} %>>전체</option>
+			<option value="SUBJECT" <%if ("SUBJECT".equals(searchField)) { out.print("selected=\"selected\"");} %>>제목</option>
+			<option value="CONTENTS" <%if ("CONTENTS".equals(searchField)) { out.print("selected=\"selected\"");} %>>내용</option>
 		</select>
 	</td>
 	<td>
-		<input type="text" style="width: 98%" />
+		<input type="text" name="searchText" value="<%=searchText %>" style="width: 98%" />
 	</td>
 	<td>
-		<input type="button" value="검색" />
-		<input type="button" value="등록" />
+		<input type="submit" value="검색" />
+		<input type="button" value="등록" onclick="location.href='boardWrite.jsp';" />
 	</td>
 </tr>
 </table>
+</form>
 <table style="border: solid 1px; width: 500px;">
-<tr>
+<tr style="background-color: skyblue;">
 	<th width="50">No.</th>
 	<th width="200">제목</th>
 	<th width="80">작성자</th>
 	<th width="50">조회수</th>
-	<th width="100">등록일자</th>
+	<th width="150">등록일자</th>
 </tr>
+<%
+	if (total == 0) {
+%>
 <tr>
 	<td colspan="5" align="center">조회된 결과가 없습니다.</td>
 </tr>
 <%
-	while(rs.next()) {
+	} else {
+	int lineNum = 0;
+	while(listRs.next()) {
+		lineNum++;
 %>
 <tr>
-	<td align="center"><%=rs.getString("NO")%></td>
-	<td><%=rs.getString("SUBJECT")%></td>
-	<td align="center"><%=rs.getString("NAME")%></td>
-	<td align="center"><%=rs.getString("READ_CNT")%></td>
-	<td align="center"><%=rs.getString("REGIST_DT")%></td>
+	<td align="center"><%=lineNum%></td>
+	<td><%=listRs.getString("SUBJECT")%></td>
+	<td align="center"><%=listRs.getString("NAME")%></td>
+	<td align="center"><%=listRs.getString("READ_CNT")%></td>
+	<td align="center"><%=listRs.getString("REGIST_DT")%></td>
 </tr>
-<% } %>
+<% } } %>
 </table>
 </body>
 </html>
 <%
-		
 	} catch (SQLException e) {
 		out.println(e.getMessage());
 	} finally {
-		if (rs != null) rs.close();
+		if (totalRs != null) totalRs.close();
+		if (listRs != null) listRs.close();
 		if (stmt != null) stmt.close();
 		if (conn != null) conn.close();
 	}
