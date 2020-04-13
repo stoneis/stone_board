@@ -97,7 +97,7 @@
 %>
 <tr>
 	<td align="center"><%=lineNum%></td>
-	<td><%=listRs.getString("SUBJECT")%></td>
+	<td><a href="boardView.jsp?no=<%=listRs.getString("NO")%>"><%=listRs.getString("SUBJECT")%></a></td>
 	<td align="center"><%=listRs.getString("NAME")%></td>
 	<td align="center"><%=listRs.getString("READ_CNT")%></td>
 	<td align="center"><%=listRs.getString("REGIST_DT")%></td>
