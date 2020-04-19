@@ -12,7 +12,8 @@
 	//form method "POST" 인 경우 한글깨짐 처리를 위함
 	request.setCharacterEncoding("UTF-8");
 
-
+	String mode = request.getParameter("mode");
+	String no = request.getParameter("no");
 	String subject = request.getParameter("subject");
 	String writer = request.getParameter("writer");
 	String contents = request.getParameter("contents");
@@ -28,26 +29,46 @@ try {
 		"1234"
 	);
 	stmt = conn.createStatement();
-	stmt.executeQuery("SELECT NVL(MAX(NO), 0)+1 FROM BOARD");
-	rs = stmt.getResultSet();
-	rs.next();
 	
-	int result = stmt.executeUpdate(
-		"INSERT INTO BOARD (" + 
-			"NO, SUBJECT, NAME, READ_CNT," + 
-			"CONTENTS, REGIST_DT, REGIST_IP" + 
-		") VALUES (" +
-			 + rs.getInt(1) + 
-			",'" + subject + "'" +
-			",'" + writer + "'" +
-			",0" +
-			",'" + contents + "'" +
-			",SYSDATE" +
-			",'" + registIp + "'" +
-		")");
+	int result = 0;
 	
+	if ("W".equals(mode)) {
+		stmt.executeQuery("SELECT NVL(MAX(NO), 0)+1 FROM BOARD");
+		rs = stmt.getResultSet();
+		rs.next();
+		result = stmt.executeUpdate(
+			"INSERT INTO BOARD (" + 
+				"NO, SUBJECT, NAME, READ_CNT," + 
+				"CONTENTS, REGIST_DT, REGIST_IP" + 
+			") VALUES (" +
+				 + rs.getInt(1) + 
+				",'" + subject + "'" +
+				",'" + writer + "'" +
+				",0" +
+				",'" + contents + "'" +
+				",SYSDATE" +
+				",'" + registIp + "'" +
+			")");
+	} else if ("M".equals(mode)) {
+		result = stmt.executeUpdate(
+			"UPDATE BOARD SET " + 
+				"SUBJECT = '" + subject + "'," +
+				"NAME = '" + writer + "'," +
+				"CONTENTS = '" + contents + "'," +
+				"CHANGE_DT = SYSDATE," +
+				"CHANGE_IP = '" + registIp + "' " +
+			"WHERE NO = " + no
+			);
+	} else if ("D".equals(mode)) {
+		result = stmt.executeUpdate("DELETE FROM BOARD WHERE NO = " + no);
+	}
+
 	if (result > 0) {
-		out.println("<script>alert('성공'); location.href='boardList.jsp';</script>");
+		if ("M".equals(mode)) {
+			out.println("<script>alert('성공'); location.href='boardView.jsp?no=" + no +"';</script>");
+		} else {
+			out.println("<script>alert('성공'); location.href='boardList.jsp';</script>");
+		}
 	} else {
 		out.println("<script>alert('실패'); location.href='boardList.jsp';</script>");
 	}

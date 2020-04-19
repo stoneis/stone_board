@@ -37,6 +37,7 @@
 <body>
 <h1>게시판 등록</h1>
 <form action="boardProcess.jsp" method="post" name="writeForm">
+<input type="hidden" name="mode" value="W" />
 <table style="border: solid 1px;">
 <tr>
 	<td>제목</td>
