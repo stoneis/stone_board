@@ -71,7 +71,9 @@
 <tr>
 	<td>내용</td>
 	<td>
-		<%=rs.getString("CONTENTS") %>
+	<%
+		out.print(rs.getString("CONTENTS").replace("\r\n","<br/>")); 
+	%>
 	</td>
 </tr>
 <tr>
