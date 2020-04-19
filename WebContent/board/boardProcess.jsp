@@ -22,6 +22,7 @@
 Connection conn = null;
 Statement stmt = null;
 ResultSet rs = null;
+String sql = "";
 try {
 	conn = DriverManager.getConnection(
 		"jdbc:oracle:thin:@localhost:1521:xe", 
@@ -36,8 +37,7 @@ try {
 		stmt.executeQuery("SELECT NVL(MAX(NO), 0)+1 FROM BOARD");
 		rs = stmt.getResultSet();
 		rs.next();
-		result = stmt.executeUpdate(
-			"INSERT INTO BOARD (" + 
+		sql = "INSERT INTO BOARD (" + 
 				"NO, SUBJECT, NAME, READ_CNT," + 
 				"CONTENTS, REGIST_DT, REGIST_IP" + 
 			") VALUES (" +
@@ -48,20 +48,22 @@ try {
 				",'" + contents + "'" +
 				",SYSDATE" +
 				",'" + registIp + "'" +
-			")");
+			")"; 
+		result = stmt.executeUpdate(sql);
 	} else if ("M".equals(mode)) {
-		result = stmt.executeUpdate(
-			"UPDATE BOARD SET " + 
+		sql = "UPDATE BOARD SET " + 
 				"SUBJECT = '" + subject + "'," +
 				"NAME = '" + writer + "'," +
 				"CONTENTS = '" + contents + "'," +
 				"CHANGE_DT = SYSDATE," +
 				"CHANGE_IP = '" + registIp + "' " +
-			"WHERE NO = " + no
-			);
+			"WHERE NO = " + no;
+		result = stmt.executeUpdate(sql);
 	} else if ("D".equals(mode)) {
-		result = stmt.executeUpdate("DELETE FROM BOARD WHERE NO = " + no);
+		sql = "DELETE FROM BOARD WHERE NO = " + no;
+		result = stmt.executeUpdate(sql);
 	}
+	System.out.println(sql);
 
 	if (result > 0) {
 		if ("M".equals(mode)) {
