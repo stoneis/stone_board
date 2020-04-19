@@ -28,12 +28,10 @@
 			whereSql += " WHERE SUBJECT LIKE '%" + searchText + "%' OR CONTENTS LIKE '%" + searchText + "%'";
 		}
 		String totalSql = "SELECT COUNT(*) AS TOTAL FROM BOARD" + whereSql;
-		// 데이터베이스 연결로부터 SQL문을 실행할수 있게 해주는 클래스 생성
+		
 		stmt = conn.createStatement();
-		// SQL문을 실행하는 메소드
 		stmt.executeQuery(totalSql);
 		System.out.println("COUNT SQL : " + totalSql);
-		// SQL문의 실행한 결과값을 얻어 온다. 
 		totalRs = stmt.getResultSet();
 		totalRs.next();
 		int total = totalRs.getInt("TOTAL");
@@ -99,7 +97,7 @@
 %>
 <tr>
 	<td align="center"><%=lineNum%></td>
-	<td><%=listRs.getString("SUBJECT")%></td>
+	<td><a href="boardView.jsp?no=<%=listRs.getString("NO")%>"><%=listRs.getString("SUBJECT")%></a></td>
 	<td align="center"><%=listRs.getString("NAME")%></td>
 	<td align="center"><%=listRs.getString("READ_CNT")%></td>
 	<td align="center"><%=listRs.getString("REGIST_DT")%></td>
