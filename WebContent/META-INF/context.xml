@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<context>
+
+	<Resource
+	  auth="Container"
+	  driverClassName="oracle.jdbc.driver.OracleDriver"
+	  url="jdbc:oracle:thin:@localhost:1521:xe"
+	  username="stone"
+	  password="1234"
+	  name="jdbc/stone"
+	  type="javax.sql.DataSource"
+	  maxActive="20"
+	  maxWait="-1"
+	/>
+
+</context>
