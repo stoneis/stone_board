@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -34,12 +35,15 @@ public class BoardListServlet extends HttpServlet {
 			rs = stmt.getResultSet();
 
 			while (rs.next()) {
-				response.getWriter().append("BOARD TOTAL DATA COUNT : ").append(rs.getString("TOTAL"));
+				request.setAttribute("total", rs.getString("TOTAL"));
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		RequestDispatcher requestDispatcher = 
+				request.getRequestDispatcher("/WEB-INF/jsp/boardList.jsp");
+		requestDispatcher.forward(request, response);
 
 	}
 
